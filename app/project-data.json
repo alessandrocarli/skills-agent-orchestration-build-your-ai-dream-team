@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding",
+      "owner": "Mona Patel",
+      "status": "Active",
+      "recentActivity": "Published the first-time contributor checklist and gathered team feedback.",
+      "priority": "High"
+    },
+    {
+      "name": "API Reliability",
+      "owner": "Jordan Lee",
+      "status": "In progress",
+      "recentActivity": "Completed the error-budget review and queued the next monitoring improvements.",
+      "priority": "Urgent"
+    },
+    {
+      "name": "Design System Refresh",
+      "owner": "Riley Chen",
+      "status": "Planning",
+      "recentActivity": "Shared updated component prototypes for accessibility review.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Documentation Hub",
+      "owner": "Avery Smith",
+      "status": "On track",
+      "recentActivity": "Migrated the search guide and added examples for common workflows.",
+      "priority": "Low"
+    }
+  ]
+}

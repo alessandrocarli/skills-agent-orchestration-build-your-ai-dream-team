@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A contributor-friendly overview of project status, activity, and priority.">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <p class="eyebrow">Team overview</p>
+      <h1>Project Pulse</h1>
+      <p>See what is moving, who owns it, and where contributors can make the biggest impact.</p>
+    </header>
+
+    <section aria-labelledby="projects-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Portfolio</p>
+          <h2 id="projects-heading">Current projects</h2>
+        </div>
+        <p id="project-summary" aria-live="polite">Loading projects...</p>
+      </div>
+      <div id="project-grid" class="project-grid" aria-live="polite"></div>
+      <p id="project-error" role="alert" hidden>We could not load the project data. Please try again shortly.</p>
+    </section>
+  </main>
+
+  <script>
+    const projectGrid = document.querySelector("#project-grid");
+    const projectSummary = document.querySelector("#project-summary");
+    const projectError = document.querySelector("#project-error");
+
+    const requiredFields = ["name", "owner", "status", "recentActivity", "priority"];
+
+    function addTextElement(parent, tagName, className, text) {
+      const element = document.createElement(tagName);
+      element.className = className;
+      element.textContent = text;
+      parent.append(element);
+      return element;
+    }
+
+    function renderProject(project) {
+      const card = document.createElement("article");
+      card.className = "project-card";
+
+      const cardHeader = document.createElement("div");
+      cardHeader.className = "project-card__header";
+      addTextElement(cardHeader, "h3", "project-card__title", project.name);
+
+      const priorityBadge = addTextElement(
+        cardHeader,
+        "span",
+        "priority-badge",
+        `Priority: ${project.priority}`
+      );
+      priorityBadge.setAttribute("aria-label", `Priority: ${project.priority}`);
+      card.append(cardHeader);
+
+      const meta = document.createElement("dl");
+      meta.className = "project-card__meta";
+
+      addTextElement(meta, "dt", "sr-only", "Owner");
+      addTextElement(meta, "dd", "owner", project.owner);
+      addTextElement(meta, "dt", "sr-only", "Status");
+      const status = addTextElement(meta, "dd", "status-badge", project.status);
+      status.setAttribute("aria-label", `Status: ${project.status}`);
+      card.append(meta);
+
+      const activity = document.createElement("div");
+      activity.className = "activity";
+      addTextElement(activity, "span", "activity__label", "Recent activity");
+      addTextElement(activity, "p", "activity__text", project.recentActivity);
+      card.append(activity);
+
+      return card;
+    }
+
+    function isProject(value) {
+      return value && typeof value === "object" &&
+        requiredFields.every((field) => typeof value[field] === "string" && value[field].trim());
+    }
+
+    async function loadProjects() {
+      try {
+        const response = await fetch("project-data.json");
+        if (!response.ok) {
+          throw new Error(`Project data request failed with ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!Array.isArray(data.projects) || data.projects.length === 0 || !data.projects.every(isProject)) {
+          throw new Error("Project data does not match the expected format");
+        }
+
+        const fragment = document.createDocumentFragment();
+        data.projects.forEach((project) => fragment.append(renderProject(project)));
+        projectGrid.replaceChildren(fragment);
+        projectSummary.textContent = `${data.projects.length} projects in view`;
+      } catch (error) {
+        projectGrid.replaceChildren();
+        projectSummary.textContent = "Projects unavailable";
+        projectError.hidden = false;
+        console.error(error);
+      }
+    }
+
+    loadProjects();
+  </script>
+</body>
+</html>
